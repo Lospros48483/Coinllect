@@ -20,9 +20,15 @@ def delete_coin(num) -> None:
 
     if coin_to_delete:
         img_name = data_info[coin_to_delete].get("image")
-        img_path = os.path.join("Images", img_name) if img_name else None
-        if img_path and os.path.exists(img_path):
-            os.remove(img_path)
+        img_path = os.path.abspath(os.path.join("Images", img_name)) if img_name else None
+        if img_path and os.path.isfile(img_path):
+            try:
+                os.remove(img_path)
+                print(f"Deleted image: {img_path}")
+            except Exception as e:
+                print(f"Could not delete image: {e}")
+        else:
+            print(f"Image file not found: {img_path}")
         del data_info[coin_to_delete]
         with open("info.json", "w") as f:
             json.dump(data_info, f, indent=4)
@@ -31,47 +37,63 @@ def delete_coin(num) -> None:
         print(f"No coin found with number {num}.")
 
 def add_coin() -> None:
-    number = 0
-    openfile = open('num.txt', 'w')
+    
     with open("num.txt", "r") as fileread:
         content = fileread.read().strip()
 
-    if content == "":  
-        number = 1 
+    if content == "":
+        number = 1
     else:
-        number = int(content) + 1
-    openfile.write(str(number))
-    
-    data_info = {}
+        number = int(content)
+
+    if os.path.exists("info.json"):
+        with open("info.json", "r") as f:
+            try:
+                data_info = json.load(f)
+            except json.JSONDecodeError:
+                data_info = {}
+    else:
+        data_info = {}
+
+    if data_info:
+        max_num = max([int(coin.get("num", 0)) for coin in data_info.values()] or [0])
+        number = max_num + 1
+    else:
+        number = 1
+
     clear()
     name = input("What name do you put to the coin: ")
     description = input("Put a description: ")
     price = input("Put the price: ")  
-    date = price = input("Put the date: ")        
+    date = input("Put the date: ")        
         
     cap = cv2.VideoCapture(0)
 
     while True:
         ret, frame = cap.read()
-
         cv2.imshow("Camera", frame)
-
         key = cv2.waitKey(1) & 0xFF
         if key == ord(" "):
             img = f"coin_{name}.png"
             save_path = os.path.join("Images", img)
             cv2.imwrite(save_path, frame)
             break
+
     data_info[name] = {
-    "name": name,
-    "description": description,
-    "price": price,
-    "image": img,
-    "date": date,
-    "num": str(number)
+        "name": name,
+        "description": description,
+        "price": price,
+        "image": img,
+        "date": date,
+        "num": str(number)
     }
+    
     with open("info.json", "w") as f:
         json.dump(data_info, f, indent=4)
+
+    # Save the new number to num.txt
+    with open('num.txt', 'w') as openfile:
+        openfile.write(str(number))
 
     cap.release()
     cv2.destroyAllWindows()
@@ -100,6 +122,7 @@ def clear() -> None:
 
 columns = shutil.get_terminal_size().columns
 width_text = int(columns / 1.5)
+number = 0
 with open('info.json', 'r') as openfile:
     data = json.load(openfile)
 
@@ -115,6 +138,7 @@ while True:
         ask1 = input("What number do you want to delete: ")
         delete_coin(ask1)
     elif ask == "v" or ask == "V":
+        splash_screen()
         ask2 = input("What number do you want to view the photo: ")
         with open('info.json', 'r') as openfile:
             data = json.load(openfile)
