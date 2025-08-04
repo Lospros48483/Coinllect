@@ -9,10 +9,10 @@ with open('num.txt', 'w') as openfile:
 
 if ask == "w" or ask == "W":
     system("powershell pip install opencv-python")
-elif ask == "m" or ask == "M":
+else:
     system("pip3 install opencv-python")
     
 if ask == "w" or ask == "W":
     system("powershell pip install pillow")
-elif ask == "m" or ask == "M":
+else:
     system("pip3 install pillow")
