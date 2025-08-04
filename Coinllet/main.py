@@ -128,7 +128,7 @@ with open('info.json', 'r') as openfile:
 
 while True:
     splash_screen()
-    ask = input("Add a coin (A), Delet a coin (D), View a photo of coin (V), View info (I) or Quit (Q) : ".center(columns))
+    ask = input("Add a coin (A), Delet a coin (D), View a photo of coin (V), View info (I), Credits (C) or Quit (Q) : ".center(columns))
     if ask == "q" or ask == "Q":
         quit()
     elif ask == "a" or ask == "A":
@@ -161,4 +161,7 @@ while True:
                 print(f"Price: {coin_data["price"]}".center(columns))
                 print(f"Date: {coin_data["date"]}".center(columns))
                 wait = input(" ")
-                
+    elif ask == "c" or ask == "C":
+        clear()
+        print("Hapily made by Lospros48483!".center(columns))
+        ask4 = input("")
